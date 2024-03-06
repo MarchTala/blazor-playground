@@ -1,0 +1,60 @@
+@page "/api-entries"
+@inject HttpClient Http
+
+<PageTitle>API Entries</PageTitle>
+
+<h1>API Entries</h1>
+
+<p>This component demonstrates fetching data from the API.</p>
+
+@if (apiEntries == null)
+{
+   <p><em>Loading...</em></p>
+}
+else
+{
+   <ul>
+   @foreach (var entry in apiEntries)
+      {
+         <li>
+            <strong>@entry.API</strong>
+            <p>@entry.Description</p>
+            <p><a href="@entry.Link" target="_blank">@entry.Link</a></p>
+         </li>
+      }
+   </ul>
+}
+
+@code {
+   private List<ApiEntry>? apiEntries;
+
+   protected override async Task OnInitializedAsync()
+   {
+      try
+      {
+         var response = await Http.GetFromJsonAsync<ApiResponse>("https://api.publicapis.org/entries");
+         apiEntries = response?.Entries;
+      }
+      catch (Exception ex)
+      {
+         Console.WriteLine($"Error: {ex.Message}");
+      }
+   }
+
+   public class ApiResponse
+   {
+      public int Count { get; set; }
+      public List<ApiEntry>? Entries { get; set; }
+   }
+
+   public class ApiEntry
+   {
+      public string? API { get; set; }
+      public string? Description { get; set; }
+      public string? Auth { get; set; }
+      public string? HTTPS { get; set; }
+      public string? Cors { get; set; }
+      public string? Link { get; set; }
+      public string? Category { get; set; }
+   }
+}
